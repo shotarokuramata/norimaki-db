@@ -11,6 +11,7 @@ pub trait KeyValueStore {
     fn delete(&mut self, key: &str) -> Result<()>;
     fn keys(&self) -> Result<Vec<String>>;
     fn clear(&mut self) -> Result<()>;
+    fn scan(&mut self, start: &str, end: &str) -> Result<Vec<(String, String)>>;
 }
 
 #[derive(Debug, Clone)]
@@ -63,6 +64,19 @@ impl KeyValueStore for MemoryStore {
     fn clear(&mut self) -> Result<()> {
         self.data.clear();
         Ok(())
+    }
+
+    fn scan(&mut self, start: &str, end: &str) -> Result<Vec<(String, String)>> {
+        if start.is_empty() || end.is_empty() {
+            return Err(StoreError::InvalidKey);
+        }
+        let mut result = Vec::new();
+        for (key, value) in &self.data {
+            if key.as_str() >= start && key.as_str() < end {
+                result.push((key.clone(), value.clone()));
+            }
+        }
+        Ok(result)
     }
 }
 
@@ -158,5 +172,18 @@ impl KeyValueStore for FileStore {
         self.data.clear();
         self.save()?;
         Ok(())
+    }
+
+    fn scan(&mut self, start: &str, end: &str) -> Result<Vec<(String, String)>> {
+        if start.is_empty() || end.is_empty() {
+            return Err(StoreError::InvalidKey);
+        }
+        let mut result = Vec::new();
+        for (key, value) in &self.data {
+            if key.as_str() >= start && key.as_str() < end {
+                result.push((key.clone(), value.clone()));
+            }
+        }
+        Ok(result)
     }
 }
