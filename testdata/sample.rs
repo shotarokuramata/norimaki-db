@@ -1,22 +1,4 @@
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MonthlySchedule {
-    pub year_month: String,
-    pub events: Vec<RaceEvent>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RaceEvent {
-    pub venue_id: u32,
-    pub venue_name: String,
-    pub event_name: String,
-    pub grade: String,
-    pub start_date: String,
-    pub duration_days: u32,
-}
-
-pub fn sample_data() -> MonthlySchedule {
+fn sample_data() -> MonthlySchedule {
     MonthlySchedule {
         year_month: "2025-09".to_string(),
         events: vec![
