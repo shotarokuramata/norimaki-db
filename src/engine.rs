@@ -131,7 +131,7 @@ impl<K: KeyValueStore> BoatRaceEngine<K> {
     /// 操作結果
     pub fn register_tournament_to_months(&mut self, tournament: &RaceEvent) -> Result<()> {
         let start_date = NaiveDate::parse_from_str(&tournament.start_date, "%Y-%m-%d")
-            .map_err(|e| crate::StoreError::InvalidValue)?;
+            .map_err(|_| crate::StoreError::InvalidValue)?;
         
         let mut current_date = start_date;
         let end_date = start_date + chrono::Duration::days(tournament.duration_days as i64 - 1);

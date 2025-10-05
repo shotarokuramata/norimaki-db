@@ -123,7 +123,7 @@ fn demo_file_operations() -> Result<()> {
 
     {
         // 2. データ読み込み
-        println!("📖 ファイルから데이터を読み込み中...");
+        println!("📖 ファイルからデータを読み込み中...");
         let store = FileStore::new(db_file)?;
         let mut engine = BoatRaceEngine::new(store);
         

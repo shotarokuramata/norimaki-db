@@ -13,6 +13,8 @@ A high-performance key-value store optimized for boat racing data management in 
 
 ## Quick Start
 
+### Installation
+
 Add to your `Cargo.toml`:
 
 ```toml
@@ -48,12 +50,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Save and retrieve monthly schedule
     engine.put_monthly_schedule(&schedule)?;
     let retrieved = engine.get_monthly_schedule(202509)?;
-    
+
     println!("Events in {}: {}", retrieved.year_month, retrieved.events.len());
-    
+
     Ok(())
 }
 ```
+
+See [examples/quick_start.rs](examples/quick_start.rs) for a complete working example.
 
 ### With File Persistence
 
@@ -74,8 +78,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Custom Race Data
 
+You can store any custom data structure that implements `Serialize`/`Deserialize`:
+
 ```rust
-use norimaki_db::{BoatRaceEngine, MemoryStore, generate_tournament_id, Serialize, Deserialize};
+use norimaki_db::{BoatRaceEngine, MemoryStore, generate_tournament_id};
+use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct RaceData {
@@ -86,24 +93,28 @@ struct RaceData {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut engine = BoatRaceEngine::new(MemoryStore::new());
-    
-    // Generate tournament ID
+
+    // Generate unique tournament ID from venue and event name
     let tournament_id = generate_tournament_id("平和島", "トーキョー・ベイ・カップ");
-    
-    // Save race data
+
+    // Save race data with timestamp
     let race = RaceData {
         race_number: 1,
         participants: vec!["選手A".to_string(), "選手B".to_string()],
         weather: "晴れ".to_string(),
     };
-    
+
     let timestamp = 1694524800000; // Unix timestamp in milliseconds
     engine.put_race_data(&tournament_id, timestamp, &race)?;
-    
-    // Retrieve race data
+
+    // Retrieve specific race
     let retrieved_race: RaceData = engine.get_race_data(&tournament_id, timestamp)?;
     println!("Race {}: {} participants", retrieved_race.race_number, retrieved_race.participants.len());
-    
+
+    // Get all races for the tournament
+    let all_races: Vec<RaceData> = engine.get_tournament_races(&tournament_id)?;
+    println!("Total races: {}", all_races.len());
+
     Ok(())
 }
 ```
@@ -155,15 +166,21 @@ Monthly View (Fast) ────► Tournament Details (On-demand)
 
 ## Examples
 
-See [`examples/boat_race_demo.rs`](examples/boat_race_demo.rs) for a comprehensive demonstration including:
+Two examples are provided:
 
-- Basic monthly schedule operations
-- File persistence and loading
-- Cross-month tournament handling
-- Custom race data structures
-- Statistics and monitoring
+### Quick Start Example
+[`examples/quick_start.rs`](examples/quick_start.rs) - Minimal example showing basic usage:
+```bash
+cargo run --example quick_start
+```
 
-Run the demo:
+### Comprehensive Demo
+[`examples/boat_race_demo.rs`](examples/boat_race_demo.rs) - Full-featured demonstration including:
+- ✅ Monthly schedule operations
+- ✅ File persistence and loading
+- ✅ Cross-month tournament handling
+- ✅ Custom race data structures
+- ✅ Statistics and monitoring
 
 ```bash
 cargo run --example boat_race_demo
